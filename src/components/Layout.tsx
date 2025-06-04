@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { LoginArea } from '@/components/auth/LoginArea';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import { Bookmark, Home, User, Plus, UserCircle, Search, Github } from 'lucide-react';
+import { Bookmark, Home, User, Plus, UserCircle, Search, Github, Code } from 'lucide-react';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { nip19 } from 'nostr-tools';
 import { cn } from '@/lib/utils';
@@ -20,7 +20,7 @@ export function Layout({ children }: LayoutProps) {
     return location.pathname === path;
   };
 
-  // Navigation items for mobile bottom bar
+  // Navigation items for mobile bottom bar (excluding bookmarklet)
   const mobileNavItems = [
     { path: '/', icon: Home, label: 'Home' },
     { path: '/search', icon: Search, label: 'Search' },
@@ -64,6 +64,17 @@ export function Layout({ children }: LayoutProps) {
                   <Link to="/search" className="flex items-center space-x-2">
                     <Search className="h-4 w-4" />
                     <span>Search</span>
+                  </Link>
+                </Button>
+                
+                <Button
+                  variant={isActive('/bookmarklet') ? 'default' : 'ghost'}
+                  size="sm"
+                  asChild
+                >
+                  <Link to="/bookmarklet" className="flex items-center space-x-2">
+                    <Code className="h-4 w-4" />
+                    <span>Bookmarklet</span>
                   </Link>
                 </Button>
                 
