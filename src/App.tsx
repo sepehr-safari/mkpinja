@@ -25,7 +25,7 @@ const queryClient = new QueryClient({
 
 export function App() {
   return (
-    <ThemeProvider defaultTheme="light" storageKey="theme">
+    <ThemeProvider defaultTheme="system" storageKey="theme">
       <AppProvider>
         <QueryClientProvider client={queryClient}>
           <NostrLoginProvider storageKey='nostr:login'>
