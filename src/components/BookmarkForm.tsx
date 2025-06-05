@@ -16,7 +16,7 @@ import { Badge } from '@/components/ui/badge';
 const bookmarkSchema = z.object({
   url: z.string().url('Please enter a valid URL'),
   title: z.string().optional(),
-  description: z.string().min(1, 'Description is required'),
+  description: z.string().optional(),
   tagInput: z.string().optional(),
 });
 
@@ -80,7 +80,7 @@ export function BookmarkForm({ onSuccess, initialUrl = '', initialTitle = '' }: 
       {
         url: data.url,
         title: data.title || undefined,
-        description: data.description,
+        description: data.description || '', // Ensure it's always a string, empty if not provided
         tags,
       },
       {
@@ -142,10 +142,10 @@ export function BookmarkForm({ onSuccess, initialUrl = '', initialTitle = '' }: 
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Description *</Label>
+            <Label htmlFor="description">Description</Label>
             <Textarea
               id="description"
-              placeholder="Describe what this bookmark is about..."
+              placeholder="Describe what this bookmark is about... (optional)"
               rows={3}
               {...register('description')}
               disabled={isPending}

@@ -17,6 +17,8 @@ import { formatDistanceToNow } from 'date-fns';
 import { toast } from 'sonner';
 import { formatBookmarkCount } from '@/lib/utils';
 import { UserDisplay } from '@/components/UserDisplay';
+import { BookmarkActions } from '@/components/BookmarkActions';
+import { CommentsSection } from '@/components/CommentsSection';
 
 interface InfiniteBookmarkListProps {
   pubkey?: string;
@@ -31,6 +33,7 @@ export function InfiniteBookmarkList({ pubkey, showUserFilter = false, initialSe
   const [selectedTag, setSelectedTag] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'title'>('newest');
   const [showFollowsOnly, setShowFollowsOnly] = useState(false);
+  const [expandedComments, setExpandedComments] = useState<Set<string>>(new Set());
 
   // Update search input when prop changes
   useEffect(() => {
@@ -144,6 +147,18 @@ export function InfiniteBookmarkList({ pubkey, showUserFilter = false, initialSe
 
   const canDelete = (bookmark: Bookmark) => {
     return user && user.pubkey === bookmark.pubkey;
+  };
+
+  const toggleComments = (bookmarkId: string) => {
+    setExpandedComments(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(bookmarkId)) {
+        newSet.delete(bookmarkId);
+      } else {
+        newSet.add(bookmarkId);
+      }
+      return newSet;
+    });
   };
 
   // Don't return early for loading state - we want to show the search interface
@@ -355,41 +370,60 @@ export function InfiniteBookmarkList({ pubkey, showUserFilter = false, initialSe
                 </p>
               )}
 
-              <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                <div className="flex items-center gap-1">
-                  <Calendar className="h-3 w-3" />
-                  <span>
-                    {formatDistanceToNow(new Date(bookmark.createdAt * 1000), { addSuffix: true })}
-                  </span>
+              <div className="space-y-3">
+                <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                  <div className="flex items-center gap-1">
+                    <Calendar className="h-3 w-3" />
+                    <span>
+                      {formatDistanceToNow(new Date(bookmark.createdAt * 1000), { addSuffix: true })}
+                    </span>
+                  </div>
+
+                  {bookmark.tags.length > 0 && (
+                    <>
+                      <span>•</span>
+                      <div className="flex items-center gap-1">
+                        <Tag className="h-3 w-3" />
+                        <div className="flex flex-wrap gap-1">
+                          {bookmark.tags.map((tag) => (
+                            <Badge
+                              key={tag}
+                              variant="outline"
+                              className="text-xs cursor-pointer hover:bg-accent"
+                              onClick={() => {
+                                setSelectedTag(tag);
+                                // Clear search when filtering by tag
+                                if (searchInput) {
+                                  setSearchInput('');
+                                }
+                              }}
+                            >
+                              {tag}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
 
-                {bookmark.tags.length > 0 && (
-                  <>
-                    <span>•</span>
-                    <div className="flex items-center gap-1">
-                      <Tag className="h-3 w-3" />
-                      <div className="flex flex-wrap gap-1">
-                        {bookmark.tags.map((tag) => (
-                          <Badge
-                            key={tag}
-                            variant="outline"
-                            className="text-xs cursor-pointer hover:bg-accent"
-                            onClick={() => {
-                              setSelectedTag(tag);
-                              // Clear search when filtering by tag
-                              if (searchInput) {
-                                setSearchInput('');
-                              }
-                            }}
-                          >
-                            {tag}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  </>
-                )}
+                {/* Bookmark actions (like and comment buttons) */}
+                <div className="flex justify-end">
+                  <BookmarkActions
+                    event={bookmark.event}
+                    onToggleComments={() => toggleComments(bookmark.id)}
+                    isCommentsExpanded={expandedComments.has(bookmark.id)}
+                  />
+                </div>
               </div>
+
+              {/* Comments section */}
+              {expandedComments.has(bookmark.id) && (
+                <CommentsSection
+                  event={bookmark.event}
+                  className="mt-4"
+                />
+              )}
             </CardContent>
           </Card>
         ))}
