@@ -1,6 +1,7 @@
 import { MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { LikeButton } from './LikeButton';
+import { ZapButton } from './ZapButton';
 import { useCommentCount } from '@/hooks/useComments';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { cn } from '@/lib/utils';
@@ -26,6 +27,14 @@ export function BookmarkActions({
     <div className={cn('flex items-center gap-1 flex-shrink-0', className)}>
       {/* Like button */}
       <LikeButton 
+        event={event}
+        variant="ghost"
+        size="sm"
+        showCount={true}
+      />
+
+      {/* Zap button */}
+      <ZapButton
         event={event}
         variant="ghost"
         size="sm"
